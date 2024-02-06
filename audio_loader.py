@@ -17,7 +17,6 @@ class AudioLoader(object):
         logging.debug("Initializing AudioLoader")
         self.data_path = Path(data_path)
         self.allowed_extensions = {".mp3", ".wav", ".flac", ".aac"}
-
         logging.debug("Looking for files in: %s", self.data_path)
         self.total_num_files_found = len(
             list(
@@ -44,8 +43,16 @@ class AudioLoader(object):
         try:
             logging.debug("Loading file: %s", filename)
             audio, sr, nc, _, _, _ = es.AudioLoader(filename=filename.as_posix())()
-            # TODO: mono audio should be resampled to 16Khz
-            return audio, sr, es.MonoMixer()(audio, nc)
+
+            mono_audio =  es.MonoMixer()(audio, nc)
+
+            # TODO: check quality parameter
+            resampled_mono_audio = es.Resample(
+                inputSampleRate=float(sr), outputSampleRate=float(16000), quality=1
+            ).compute(mono_audio)
+
+            return audio, sr, resampled_mono_audio
+        
         except Exception as e:
             logging.error(e)
 
@@ -58,4 +65,4 @@ class AudioLoader(object):
         """
         for file in tqdm(self.data_path.rglob("*"), total=self.total_num_files_found):
             if file.suffix.lower() in self.allowed_extensions and file.is_file():
-                yield self._load_audio(file)
+                yield *self._load_audio(file), file
