@@ -25,13 +25,9 @@ if __name__ == "__main__":
     audio_loader = AudioLoader(data_path=DATA_PATH)
     feature_extractor = FeatureExtractor()
 
-    counter = 0
     all_features = []
     genre_activations = []
     for audio, sr, audio_mono, filename in audio_loader.yield_all():
-        counter += 1
-        if counter == 2:
-            break
 
         # get embeddings needed for music similarity and input to essentia models
         discogs_embeddings = feature_extractor.get_discogss_efnet_embeddings(audio_mono)
