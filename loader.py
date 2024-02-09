@@ -2,7 +2,6 @@ import logging
 
 import essentia.standard as es
 from pathlib import Path
-from tqdm import tqdm
 
 
 class AudioLoader(object):
@@ -62,6 +61,6 @@ class AudioLoader(object):
         Yields:
         - Tuple: (audio, sr, audio_mono) for each valid audio file.
         """
-        for file in tqdm(self.data_path.rglob("*"), total=self.total_num_files_found):
+        for file in self.data_path.rglob("*"):
             if file.suffix.lower() in self.allowed_extensions and file.is_file():
                 yield *self._load_audio(file), file

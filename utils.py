@@ -2,6 +2,7 @@ import jsonlines
 import json
 import os
 import pickle
+import pandas
 
 def load_json(file_path):
     try:
@@ -19,3 +20,8 @@ def save_result(path, name, file, pickle_only=True):
 
     with open(os.path.join(path, name + ".pkl"), "wb") as f:
         pickle.dump(file, f)
+
+
+def load_essentia_analysis(ESSENTIA_ANALYSIS_PATH):
+    return pandas.read_pickle(ESSENTIA_ANALYSIS_PATH)
+

@@ -18,11 +18,7 @@ This repository contains scripts and tools for analyzing a collection of audio f
 - voice_instrumental-discogs-effnet-1.pb
 
 # Usage
-Create and activate a virtual environment:
-```bash
-python -m venv music-analyzer
-source music-analyzer/bin/activate
-```
+It encouraged the usage of a virtual environment :innocent:
 
 Install requirements:
 ```bash
@@ -31,6 +27,11 @@ pip install -r requirements.txt
 ### To run the script to extract descriptors:
 ```bash
 python extract_main.py
+```
+
+### To run the web app:
+```bash
+./run.sh
 ```
 
 # Acknowledgments:

@@ -6,6 +6,7 @@ import essentia
 import utils as u
 from loader import AudioLoader
 from extractor import FeatureExtractor
+from tqdm import tqdm
 
 DATA_PATH = "audio"
 DESCRIPTORS_PATH = "descriptors"
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     counter = 0
     all_features = []
     genre_activations = []
-    for audio, sr, audio_mono, filename in audio_loader.yield_all():
+    for audio, sr, audio_mono, filename in tqdm(audio_loader.yield_all(), total=audio_loader.total_num_files_found):
         counter += 1
         if counter == 3:
             break
