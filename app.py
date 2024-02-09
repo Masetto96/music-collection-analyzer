@@ -16,7 +16,9 @@ import utils as u
 
 import streamlit_helpers as st_helpers
 
-ESSENTIA_ANALYSIS_PATH = 'data/files_essentia_effnet-discogs.jsonl.pickle'
+# ESSENTIA_ANALYSIS_PATH = 'data/files_essentia_effnet-discogs.jsonl.pickle'
+ESSENTIA_ANALYSIS_PATH = 'descriptors/discogs-400-genre.pkl'
+
 PLAYLIST_PATH = "playlists"
 
 # Main script
