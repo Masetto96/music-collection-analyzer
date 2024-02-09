@@ -1,17 +1,17 @@
 import logging
-
+import json
 import numpy as np
 import essentia.standard as es
+import utils as u
 
 
 class FeatureExtractor(object):
-    def __init__(
-        self,
-    ):
+    def __init__(self, discogs_effnet_metadata: str):
         """
         Initializes various feature extractors using pre-trained models from ESSENTIA as well as DSP techniques.
         https://essentia.upf.edu/models.html
         """
+        self.discogs_effnet_metadata = u.load_json(discogs_effnet_metadata)
 
         self.tempo_extractor = es.RhythmExtractor2013()
         self.loudness_extractor = es.LoudnessEBUR128()
@@ -21,10 +21,11 @@ class FeatureExtractor(object):
         self.key_extractor_krumhansl = es.KeyExtractor(profileType="krumhansl")
         self.key_extractor_edma = es.KeyExtractor(profileType="edma")
 
-        self.discogs_efnet_embed = es.TensorflowPredictEffnetDiscogs(
+        self.discogs_effnet_embed = es.TensorflowPredictEffnetDiscogs(
             graphFilename="weights/discogs-effnet-bs64-1.pb",
             output="PartitionedCall:1",
         )
+
         self.msd_music_cnn_embeddings = es.TensorflowPredictMusiCNN(
             graphFilename="weights/msd-musicnn-1.pb", output="model/dense/BiasAdd"
         )
@@ -57,13 +58,13 @@ class FeatureExtractor(object):
 
     def extract_key_temperly(self, audio: np.array):
         return self.key_extractor_temperley(audio)
-    
+
     def extract_key_edma(self, audio: np.array):
         return self.key_extractor_edma(audio)
 
     def extract_key_krumhansl(self, audio: np.array):
         return self.key_extractor_krumhansl(audio)
-        
+
     def extract_loudness(self, audio: np.array, sr=44100):
         """
         https://essentia.upf.edu/reference/std_LoudnessEBUR128.html
@@ -78,7 +79,7 @@ class FeatureExtractor(object):
             logging.warning(e)
 
     def get_discogss_efnet_embeddings(self, audio: np.array):
-        return self.discogs_efnet_embed(audio)
+        return self.discogs_effnet_embed(audio)
 
     def get_msd_music_cnn_embeddings(self, audio: np.array):
         return self.msd_music_cnn_embeddings(audio)
@@ -88,7 +89,9 @@ class FeatureExtractor(object):
         Returns activations for all the 400 genre.
         It averages over all the frames.
         """
-        return np.mean(self.discogs_genre_clf(discogs_embeddings), axis=0)
+        return self._parse_discogs_genre_activations(
+            np.mean(self.discogs_genre_clf(discogs_embeddings), axis=0)
+        )
 
     def predict_voice_instrumental(self, discogs_embeddings):
         """
@@ -110,3 +113,15 @@ class FeatureExtractor(object):
         Avaraging over all the frames.
         """
         return np.mean(self.arousal_valence_clf(music_cnn_embeddings), axis=0).tolist()
+
+    def _parse_discogs_genre_activations(self, activations: np.array):
+        """
+        Takes as input the activations for all the 400 genre.
+        Uses metadata to associate each activations with the corresponding genre.
+        Returns human readable information :)
+        """
+        classes = self.discogs_effnet_metadata["classes"]
+
+        assert len(classes) == len(activations)
+
+        return dict(zip(classes, activations.tolist()))
