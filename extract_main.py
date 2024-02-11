@@ -25,11 +25,15 @@ if __name__ == "__main__":
     essentia.log.warningActive = False  # deactivate the warning level
 
     audio_loader = AudioLoader(data_path=DATA_PATH)
-    feature_extractor = FeatureExtractor(discogs_effnet_metadata=DISCOGS_EFFNET_METADATA_PATH)
+    feature_extractor = FeatureExtractor(
+        discogs_effnet_metadata=DISCOGS_EFFNET_METADATA_PATH
+    )
     all_features = []
     all_genre_activations = []
-    for audio, sr, audio_mono, filename in tqdm(audio_loader.yield_all(), total=audio_loader.total_num_files_found):
-
+    counter = 0
+    for audio, sr, audio_mono, filename in tqdm(
+        audio_loader.yield_all(), total=audio_loader.total_num_files_found
+    ):
         # get embeddings needed for music similarity and input to essentia models
         # TODO: save embeddings
         discogs_embeddings = feature_extractor.get_discogss_efnet_embeddings(audio_mono)
@@ -38,9 +42,7 @@ if __name__ == "__main__":
         )
 
         genre_activations = feature_extractor.predict_genre(discogs_embeddings)
-        all_genre_activations.append(
-            [filename.as_posix(), genre_activations]
-        )
+        all_genre_activations.append([filename.as_posix(), genre_activations])
 
         features = [
             filename.as_posix(),
@@ -70,5 +72,9 @@ if __name__ == "__main__":
 
     # create a directory if not exists
     os.makedirs(DESCRIPTORS_PATH, exist_ok=True)
-    # u.save_result(DESCRIPTORS_PATH, "descriptors-but-genre", all_features, pickle_only=True)
-    u.save_result(DESCRIPTORS_PATH, "discogs-400-genre", all_genre_activations, pickle_only=True)
+    u.save_result(
+        DESCRIPTORS_PATH, "descriptors-but-genre", all_features, pickle_only=True
+    )
+    u.save_result(
+        DESCRIPTORS_PATH, "discogs-400-genre", all_genre_activations, pickle_only=True
+    )

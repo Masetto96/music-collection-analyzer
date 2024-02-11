@@ -9,6 +9,12 @@ def filter_by_style(audio_analysis, style_select, style_select_range):
         result = result.loc[result[style] >= style_select_range[0]]
     return result
 
+def filter_by_bpm(audio_analysis:list, max_bpm:int, min_bpm:int):
+    return audio_analysis[(audio_analysis['tempo'] >= min_bpm) & (audio_analysis['tempo'] <= max_bpm)].index
+
+def filter_by_arousal_and_valence():
+    pass
+
 # Ranking module
 def rank_by_style(audio_analysis, style_rank, mp3s):
     audio_analysis_query = audio_analysis.loc[mp3s][style_rank]
@@ -25,16 +31,18 @@ def shuffle_tracks(track_list):
     return track_list
 
 # Saving module
-def save_playlist(file_name, track_list, playlist_path):
+def save_playlist(file_name:str, track_list:list, playlist_path):
     with open(os.path.join(playlist_path, file_name+".m3u8"), 'w') as f:
         mp3_paths = [os.path.join('..', mp3) for mp3 in track_list]
         f.write('\n'.join(mp3_paths))
 
 # Display results module
 def display_results(result, max_tracks):
+    st.write("Your results from the search")
     st.write(result.head(max_tracks))
 
-def display_audio_previews(track_list):
-    st.write('Audio previews for the first 10 results:')
+def display_audio_previews(track_list:list):
+    st.info("Audio preview available only for 10 tracks.")
     for mp3 in track_list[:10]:
+        st.write('\n'.join(mp3))
         st.audio(mp3, format="audio/mp3", start_time=0)

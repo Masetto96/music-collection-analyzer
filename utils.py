@@ -2,7 +2,7 @@ import jsonlines
 import json
 import os
 import pickle
-import pandas
+import pandas as pd
 
 def load_json(file_path):
     try:
@@ -22,6 +22,17 @@ def save_result(path, name, file, pickle_only=True):
         pickle.dump(file, f)
 
 
+def read_pickle_descriptors(pickle_file_path: str) -> pd.DataFrame:
+    with open(pickle_file_path, 'rb') as f:
+        data = pickle.load(f)
+    df = pd.DataFrame(data, columns=['file_path', 'features'])
+    # Unpack the dictionary of features
+    df_features = pd.json_normalize(df['features'])
+    # Combine the unpacked features DataFrame with the original DataFrame
+    df = pd.concat([df[['file_path']], df_features], axis=1)
+    return df
+
+
 def load_essentia_analysis(ESSENTIA_ANALYSIS_PATH):
-    return pandas.read_pickle(ESSENTIA_ANALYSIS_PATH)
+    return pd.read_pickle(ESSENTIA_ANALYSIS_PATH)
 
