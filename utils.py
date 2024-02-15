@@ -1,7 +1,10 @@
-import jsonlines
-import json
 import os
+import json
 import pickle
+
+import jsonlines
+
+import numpy as np
 import pandas as pd
 
 def load_json(file_path):
@@ -36,3 +39,16 @@ def read_pickle_descriptors(pickle_file_path: str) -> pd.DataFrame:
 def load_essentia_analysis(ESSENTIA_ANALYSIS_PATH):
     return pd.read_pickle(ESSENTIA_ANALYSIS_PATH)
 
+def read_numpy_arrays_from_pickle(filename):
+    arrays = []
+    try:
+        with open(filename, 'rb') as file:
+            while True:
+                try:
+                    array = pickle.load(file)
+                    arrays.append(array)
+                except EOFError:
+                    break
+    except Exception as e:
+        print(f"An error occurred while reading: {e}")
+    return np.array(arrays)

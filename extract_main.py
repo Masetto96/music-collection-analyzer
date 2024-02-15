@@ -1,8 +1,7 @@
 import os
 import logging
-
+import pickle
 import essentia
-
 import utils as u
 from loader import AudioLoader
 from extractor import FeatureExtractor
@@ -28,21 +27,28 @@ if __name__ == "__main__":
     feature_extractor = FeatureExtractor(
         discogs_effnet_metadata=DISCOGS_EFFNET_METADATA_PATH
     )
+    counter = 0
+
+    # create a directory if not exists and opne file streams
+    os.makedirs(EMBEDDINGS_PATH, exist_ok=True)
+    os.makedirs(DESCRIPTORS_PATH, exist_ok=True)
+    embed_discogs_file = open(os.path.join(EMBEDDINGS_PATH, "discogs.pkl"), 'ab')
+    embed_musiccnn_file = open(os.path.join(EMBEDDINGS_PATH, "musiccnn.pkl"), 'ab')
+
     all_features = []
     all_genre_activations = []
-    counter = 0
     for audio, sr, audio_mono, filename in tqdm(
         audio_loader.yield_all(), total=audio_loader.total_num_files_found
     ):
+        counter += 1
+        if counter == 5:
+            break
         # get embeddings needed for music similarity and input to essentia models
-        # TODO: save embeddings
         discogs_embeddings = feature_extractor.get_discogss_efnet_embeddings(audio_mono)
         music_cnn_embeddings = feature_extractor.get_msd_music_cnn_embeddings(
             audio_mono
         )
-
-        genre_activations = feature_extractor.predict_genre(discogs_embeddings)
-        all_genre_activations.append([filename.as_posix(), genre_activations])
+        # genre_activations = feature_extractor.predict_genre(discogs_embeddings)
 
         features = [
             filename.as_posix(),
@@ -66,15 +72,22 @@ if __name__ == "__main__":
             },
         ]
 
-        # # Append features to the list
-        all_features.append(features)
+        # SAVE FEATURES, GENRE, EMBEDDINGS
+        all_features.append(features) # Append features to the list
+        pickle.dump(discogs_embeddings, embed_discogs_file) # Append discogs_embeddings
+        pickle.dump(music_cnn_embeddings, embed_musiccnn_file) # Append musiccnn_embeddings
+
+        # all_genre_activations.append(genre_activations) # Append genre_activations)
+
         logging.debug("Features computed and appended")
 
-    # create a directory if not exists
-    os.makedirs(DESCRIPTORS_PATH, exist_ok=True)
+    # close file streams
+    embed_musiccnn_file.close()
+    embed_discogs_file.close()
+
     u.save_result(
-        DESCRIPTORS_PATH, "descriptors-but-genre", all_features, pickle_only=True
+        DESCRIPTORS_PATH, "descriptors-but-genre-v2", all_features, pickle_only=True
     )
-    u.save_result(
-        DESCRIPTORS_PATH, "discogs-400-genre", all_genre_activations, pickle_only=True
-    )
+    # u.save_result(
+    #     DESCRIPTORS_PATH, "discogs-400-genre-test", all_genre_activations, pickle_only=True
+    # )

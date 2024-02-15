@@ -16,6 +16,7 @@ class AudioLoader(object):
         logging.debug("Initializing AudioLoader")
         self.data_path = Path(data_path)
         self.allowed_extensions = {".mp3", ".wav", ".flac", ".aac"}
+        self.mono_mixer = es.MonoMixer()
         logging.debug("Looking for files in: %s", self.data_path)
         self.total_num_files_found = len(
             list(
@@ -43,8 +44,10 @@ class AudioLoader(object):
             logging.debug("Loading file: %s", filename)
             audio, sr, nc, _, _, _ = es.AudioLoader(filename=filename.as_posix())()
 
-            mono_audio = es.MonoMixer()(audio, nc)
+            # mono_audio = es.MonoMixer()(audio, nc)
+            mono_audio = self.mono_mixer(audio, nc)
 
+            # REVIEW: check quality parameter
             resampled_mono_audio = es.Resample(
                 inputSampleRate=float(sr), outputSampleRate=float(16000), quality=1
             ).compute(mono_audio)

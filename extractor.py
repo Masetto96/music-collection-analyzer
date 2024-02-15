@@ -13,7 +13,8 @@ class FeatureExtractor(object):
         """
         self.discogs_effnet_metadata = u.load_json(discogs_effnet_metadata)
 
-        self.tempo_extractor = es.RhythmExtractor2013()
+        # self.tempo_extractor = es.RhythmExtractor2013()
+        self.bpm_extractor = es.TempoCNN(graphFilename="weights/deeptemp-k16-3.pb")
         self.loudness_extractor = es.LoudnessEBUR128()
 
         # https://essentia.upf.edu/reference/std_KeyExtractor.html
@@ -50,8 +51,10 @@ class FeatureExtractor(object):
         """
         https://essentia.upf.edu/reference/std_RhythmExtractor2013.html
         """
-        bpm = self.tempo_extractor(audio)[0]
-        return int(bpm)
+        # bpm = self.tempo_extractor(audio)[0]
+        # return int(bpm)
+        global_tempo, _, _ = self.bpm_extractor(audio)
+        return global_tempo
         # global_tempo, _, _ = self.tempo_extractor(audio)
         # returning beats per minute (bpm)
         # return global_tempo
@@ -98,21 +101,21 @@ class FeatureExtractor(object):
         Returns softmax.
         Avaraging over all the frames.
         """
-        return np.mean(self.voice_instrumental_clf(discogs_embeddings), axis=0).tolist()
+        return tuple(np.mean(self.voice_instrumental_clf(discogs_embeddings), axis=0).tolist())
 
     def predict_danceability(self, discogs_embeddings):
         """
         Returns softmax.
         Avaraging over all the frames.
         """
-        return np.mean(self.danceability_clf(discogs_embeddings), axis=0).tolist()
+        return tuple(np.mean(self.danceability_clf(discogs_embeddings), axis=0).tolist())
 
     def predict_arousal_valence(self, music_cnn_embeddings):
         """
         Returns softmax.
         Avaraging over all the frames.
         """
-        return np.mean(self.arousal_valence_clf(music_cnn_embeddings), axis=0).tolist()
+        return tuple(np.mean(self.arousal_valence_clf(music_cnn_embeddings), axis=0).tolist())
 
     def _parse_discogs_genre_activations(self, activations: np.array):
         """
