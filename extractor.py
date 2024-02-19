@@ -1,5 +1,4 @@
 import logging
-import json
 import numpy as np
 import essentia.standard as es
 import utils as u
@@ -12,7 +11,6 @@ class FeatureExtractor(object):
         https://essentia.upf.edu/models.html
         """
         self.discogs_effnet_metadata = u.load_json(discogs_effnet_metadata)
-
         # self.tempo_extractor = es.RhythmExtractor2013()
         self.bpm_extractor = es.TempoCNN(graphFilename="weights/deeptemp-k16-3.pb")
         self.loudness_extractor = es.LoudnessEBUR128()
@@ -48,17 +46,11 @@ class FeatureExtractor(object):
         )
 
     def extract_tempo(self, audio: np.array):
-        """
-        https://essentia.upf.edu/reference/std_RhythmExtractor2013.html
-        """
         # bpm = self.tempo_extractor(audio)[0]
         # return int(bpm)
         global_tempo, _, _ = self.bpm_extractor(audio)
         return global_tempo
-        # global_tempo, _, _ = self.tempo_extractor(audio)
-        # returning beats per minute (bpm)
-        # return global_tempo
-
+    
     def extract_key_temperly(self, audio: np.array):
         return self.key_extractor_temperley(audio)
 
@@ -101,14 +93,14 @@ class FeatureExtractor(object):
         Returns softmax.
         Avaraging over all the frames.
         """
-        return tuple(np.mean(self.voice_instrumental_clf(discogs_embeddings), axis=0).tolist())
+        return tuple(np.mean(self.voice_instrumental_clf(discogs_embeddings), axis=0))[0]
 
     def predict_danceability(self, discogs_embeddings):
         """
         Returns softmax.
         Avaraging over all the frames.
         """
-        return tuple(np.mean(self.danceability_clf(discogs_embeddings), axis=0).tolist())
+        return tuple(np.mean(self.danceability_clf(discogs_embeddings), axis=0))[0]
 
     def predict_arousal_valence(self, music_cnn_embeddings):
         """

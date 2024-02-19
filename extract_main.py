@@ -40,9 +40,7 @@ if __name__ == "__main__":
     for audio, sr, audio_mono, filename in tqdm(
         audio_loader.yield_all(), total=audio_loader.total_num_files_found
     ):
-        counter += 1
-        if counter == 5:
-            break
+
         # get embeddings needed for music similarity and input to essentia models
         discogs_embeddings = feature_extractor.get_discogss_efnet_embeddings(audio_mono)
         music_cnn_embeddings = feature_extractor.get_msd_music_cnn_embeddings(
@@ -89,5 +87,5 @@ if __name__ == "__main__":
         DESCRIPTORS_PATH, "descriptors-but-genre-v2", all_features, pickle_only=True
     )
     # u.save_result(
-    #     DESCRIPTORS_PATH, "discogs-400-genre-test", all_genre_activations, pickle_only=True
+    #     DESCRIPTORS_PATH, "discogs-400-genrez", all_genre_activations, pickle_only=True
     # )
