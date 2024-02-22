@@ -2,7 +2,7 @@ import os
 import logging
 import pickle
 import essentia
-import utils as u
+import helpers.utils as u
 from loader import AudioLoader
 from extractor import FeatureExtractor
 from tqdm import tqdm
@@ -31,6 +31,7 @@ if __name__ == "__main__":
     # Create directories if  they not exist. 
     os.makedirs(EMBEDDINGS_PATH, exist_ok=True)
     os.makedirs(DESCRIPTORS_PATH, exist_ok=True)
+    
     # Open file Streams
     embed_discogs_file = open(os.path.join(EMBEDDINGS_PATH, "discogs.pkl"), 'wb')
     embed_musiccnn_file = open(os.path.join(EMBEDDINGS_PATH, "musiccnn.pkl"), 'wb')
@@ -48,36 +49,36 @@ if __name__ == "__main__":
         music_cnn_embeddings = feature_extractor.get_msd_music_cnn_embeddings(
             audio_mono
         )
-        # genre_activations = feature_extractor.predict_genre(discogs_embeddings)
+        genre_activations = feature_extractor.predict_genre(discogs_embeddings)
         
-        # counter += 1
-        # if counter == 3:
-        #     break
+        counter += 1
+        if counter == 3:
+            break
 
-        # features = [
-        #     filename.as_posix(),
-        #     {
-        #         "loudness": feature_extractor.extract_loudness(audio, sr),
-        #         "tempo": feature_extractor.extract_tempo(audio_mono),
-        #         "voice_instrumental": feature_extractor.predict_voice_instrumental(
-        #             discogs_embeddings
-        #         ),
-        #         "danceability": feature_extractor.predict_danceability(
-        #             discogs_embeddings
-        #         ),
-        #         "arousal_valence": feature_extractor.predict_arousal_valence(
-        #             music_cnn_embeddings
-        #         ),
-        #         "keyscale_edma": feature_extractor.extract_key_edma(audio_mono),
-        #         "keyscale_krumhansl": feature_extractor.extract_key_krumhansl(
-        #             audio_mono
-        #         ),
-        #         "keyscale_temperly": feature_extractor.extract_key_temperly(audio_mono),
-        #     },
-        # ]
+        features = [
+            filename.as_posix(),
+            {
+                "loudness": feature_extractor.extract_loudness(audio, sr),
+                "tempo": feature_extractor.extract_tempo(audio_mono),
+                "voice_instrumental": feature_extractor.predict_voice_instrumental(
+                    discogs_embeddings
+                ),
+                "danceability": feature_extractor.predict_danceability(
+                    discogs_embeddings
+                ),
+                "arousal_valence": feature_extractor.predict_arousal_valence(
+                    music_cnn_embeddings
+                ),
+                "keyscale_edma": feature_extractor.extract_key_edma(audio_mono),
+                "keyscale_krumhansl": feature_extractor.extract_key_krumhansl(
+                    audio_mono
+                ),
+                "keyscale_temperly": feature_extractor.extract_key_temperly(audio_mono),
+            },
+        ]
 
         # SAVE FEATURES and GENRE ACTIVATIONS
-        # all_features.append(features) # Append features to the list
+        all_features.append(features) # Append features to the list
         # discogs_json.write(pickle.dumps({"file_path" : filename.as_posix(), **genre_activations}) + b"\n") 
 
         # SAVE EMBEDDINGS and INDEXES
@@ -94,9 +95,9 @@ if __name__ == "__main__":
     embed_discogs_file.close()
     # discogs_json.close()
 
-    # u.save_result(
-    #     DESCRIPTORS_PATH, "descriptors-but-genre-v2", all_features, pickle_only=True
-    # )
-    # u.save_result(
-    #     DESCRIPTORS_PATH, "discogs-400-genre", all_genre_activations, pickle_only=True
-    # )
+    u.save_result(
+        DESCRIPTORS_PATH, "descriptors-but-genre-v2", all_features, pickle_only=True
+    )
+    u.save_result(
+        DESCRIPTORS_PATH, "discogs-400-genre", all_genre_activations, pickle_only=True
+    )

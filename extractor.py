@@ -1,7 +1,7 @@
 import logging
 import numpy as np
 import essentia.standard as es
-import utils as u
+import helpers.utils as u
 
 
 class FeatureExtractor(object):
@@ -12,7 +12,7 @@ class FeatureExtractor(object):
         """
         self.discogs_effnet_metadata = u.load_json(discogs_effnet_metadata)
         # self.tempo_extractor = es.RhythmExtractor2013()
-        self.bpm_extractor = es.TempoCNN(graphFilename="weights/deeptemp-k16-3.pb")
+        self.bpm_extractor = es.TempoCNN(graphFilename="weights/deeptemp-k4-3.pb")
         self.loudness_extractor = es.LoudnessEBUR128()
 
         # https://essentia.upf.edu/reference/std_KeyExtractor.html
