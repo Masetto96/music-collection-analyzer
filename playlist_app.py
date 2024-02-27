@@ -1,20 +1,19 @@
 import os
 
+import pandas as pd
 import streamlit as st
-import matplotlib.pyplot as plt
 import helpers.utils as u
 import helpers.playlist_options as playlist_helpers
 import helpers.streamlit_helpers as st_helpers
-import seaborn as sns
 
 # ESSENTIA_ANALYSIS_PATH = 'data/files_essentia_effnet-discogs.jsonl.pickle'
-DISCOGS_400_GENRE_ACTIVATIONS_PATH = "descriptors/discogs-400-genre.pkl"
-DESCRIPTORS_PATH = "descriptors/descriptors-but-genre-v3.pkl"
+DISCOGS_400_GENRE_ACTIVATIONS_PATH = "descriptors/400-genre-activations.pkl"
+DESCRIPTORS_PATH = "descriptors/descriptors-but-genre-v4.pkl"
 PLAYLIST_PATH = "playlists"
 
-# audio_analysis = u.load_DISCOGS_EFFNECT_GENRE(DISCOGS_GENRE_ACTIVATIONS_PATH)
-genre_activations = u.read_pickle_descriptors(DISCOGS_400_GENRE_ACTIVATIONS_PATH)
-essentia_descriptors = u.read_pickle_descriptors(DESCRIPTORS_PATH)
+genre_activations = pd.DataFrame(pd.read_pickle(DISCOGS_400_GENRE_ACTIVATIONS_PATH))
+essentia_descriptors = pd.DataFrame(pd.read_pickle(DESCRIPTORS_PATH))
+
 
 ## DISCLAIMER:
 # The following line is needed for my implementations as I run the extractor on different machines and the structure of the directories was not the same (in 1 case it was nested)
@@ -59,6 +58,7 @@ if playlist_option == "Genre":
             value=[0.5, 1.0],
         )
 
+
 if playlist_option == "BPM":
     min_tempo, max_tempo = playlist_helpers.select_by_bpm(essentia_descriptors)
 
@@ -67,7 +67,7 @@ if playlist_option == "Arousal-Valence":
 
 if playlist_option == "Vocal-Instrumental":
     is_instrumental = playlist_helpers.select_vocal_instrumental(essentia_descriptors)
-    
+
 if playlist_option == "Danceability":
     lower_bound_dance, upper_bound_dance = playlist_helpers.select_by_danceability(essentia_descriptors)
 
@@ -103,11 +103,11 @@ if st.button("RUN"):
     mp3s_idxs = list(essentia_descriptors.index)
     st.write("## 🔊 Results")
 
-    # TODO: refactor this code
     if playlist_option == "Genre":
-        result = st_helpers.filter_by_style(
-            genre_activations, style_select, style_select_range
-        )
+        audio_analysis_query = genre_activations.loc[mp3s_idxs][style_select]
+        result = audio_analysis_query
+        for style in style_select:
+            result = result.loc[result[style] >= style_select_range[0]]
         st.write(result)
         mp3s_idxs = result.index
         st.success(f"Found {len(mp3s_idxs)} songs")
@@ -136,7 +136,7 @@ if st.button("RUN"):
             min_arousal=min_arousal,
         )
         st.success(f"Found {len(mp3s_idxs)} songs")
-        st.dataframe(essentia_descriptors.iloc[mp3s_idxs]["arousal_valence"])
+        # st.dataframe(essentia_descriptors.iloc[mp3s_idxs]["valence_arousal"])
 
     elif playlist_option == "Key-Scale":
         mp3s_idxs = st_helpers.filter_by_key_scale(essentia_descriptors, key, mode)

@@ -2,10 +2,7 @@ import os
 import json
 import pickle
 
-import jsonlines
-
 import numpy as np
-import pandas as pd
 
 def load_json(file_path):
     try:
@@ -16,29 +13,17 @@ def load_json(file_path):
     except json.JSONDecodeError:
         print("Invalid JSON format.")
 
-# def save_result(path, name, file, pickle_only=True):
-#     # this is not right and maybe useless
-#     if not pickle_only:
-#         with jsonlines.open(os.path.join(path, name + ".json"), mode="w") as writer:
-#             writer.write_all(file)
-
-#     with open(os.path.join(path, name + ".pkl"), "wb") as f:
-#         pickle.dump(file, f)
-
-# def read_pickle_descriptors(pickle_file_path: str) -> pd.DataFrame:
-#     with open(pickle_file_path, 'rb') as f:
-#         data = pickle.load(f)
-#     df = pd.DataFrame(data, columns=['file_path', 'features'])
-#     # Unpack the dictionary of features
-#     df_features = pd.json_normalize(df['features'])
-#     # Combine the unpacked features DataFrame with the original DataFrame
-#     df = pd.concat([df[['file_path']], df_features], axis=1)
-#     return df
-
-# def load_essentia_analysis(ESSENTIA_ANALYSIS_PATH):
-#     return pd.read_pickle(ESSENTIA_ANALYSIS_PATH)
-
 def read_numpy_arrays_from_pickle(filename, with_averaging=False):
+    """
+    Read numpy arrays from a pickle file.
+
+    Args:
+        filename (str): The name of the pickle file to read from.
+        with_averaging (bool, optional): Whether to calculate the mean of the arrays. Defaults to False.
+
+    Returns:
+        list: A list of numpy arrays read from the pickle file.
+    """
     arrays = []
     try:
         with open(filename, 'rb') as file:
@@ -56,7 +41,7 @@ def read_numpy_arrays_from_pickle(filename, with_averaging=False):
         print(f"An error occurred while reading: {e}")
     return arrays
 
-def get_most_similar_embeddings(similarity_matrix:np.array, idx:int, k:int=10):
+def get_most_similar_embeddings(similarity_matrix: np.array, idx:int, k:int=10): # type: ignore
     """
     A function to get the most similar embeddings based on a similarity matrix.
 

@@ -39,7 +39,6 @@ if __name__ == "__main__":
     embed_musiccnn_file = open(os.path.join(EMBEDDINGS_PATH, "musiccnn.pkl"), "wb")
     embed_indexes = open(os.path.join(EMBEDDINGS_PATH, "embed_idxs.txt"), "w")
 
-    counter = 0
     all_features = []
     all_genre_activations = []
 
@@ -56,10 +55,6 @@ if __name__ == "__main__":
         )
         genre_activations = feature_extractor.predict_genre(discogs_embeddings)
         genre_activations.update({"file_path": filename.as_posix()})
-
-        counter += 1
-        if counter == 10:
-            break
 
         features = {
             "file_path": filename.as_posix(),
@@ -89,9 +84,7 @@ if __name__ == "__main__":
 
         # SAVE EMBEDDINGS and INDEXES
         pickle.dump(discogs_embeddings, embed_discogs_file)  # Append discogs_embeddings
-        pickle.dump(
-            music_cnn_embeddings, embed_musiccnn_file
-        )  # Append musiccnn_embeddings
+        pickle.dump(music_cnn_embeddings, embed_musiccnn_file)  # Append musiccnn_embeddings
         embed_indexes.write(filename.as_posix())
         embed_indexes.write("\n")
 

@@ -3,22 +3,6 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# def select_by_genre(genre_activations, audio_analysis_styles):
-#     st.write("### By style")
-#     st.write("Style activation statistics:")
-#     st.write(genre_activations.describe())
-#     st.info("Genres available:")
-#     st.dataframe(audio_analysis_styles, use_container_width=True)
-#     style_select = st.multiselect("Select by style activations:", audio_analysis_styles)
-#     if style_select:
-#         st.write(genre_activations[style_select].describe())
-#         style_select_str = ", ".join(style_select)
-#         style_select_range = st.slider(
-#             f"Select tracks with `{style_select_str}` activations within range:",
-#             value=[0.5, 1.0],
-#         )
-#     return style_select_range, style_select
-
 def select_by_bpm(essentia_descriptors):
     st.write("### By Beats per Minute")
     fig, ax = plt.subplots()
@@ -35,12 +19,12 @@ def select_by_bpm(essentia_descriptors):
 def select_by_arousal_valence(essentia_descriptors):
     st.write("### By Arousal and Valence")
     joint_plot = sns.jointplot(
-        x=essentia_descriptors["arousal_valence"].apply(lambda x: x[0]),
-        y=essentia_descriptors["arousal_valence"].apply(lambda x: x[1]),
+        x=essentia_descriptors["valence_arousal"].apply(lambda x: x[0]),
+        y=essentia_descriptors["valence_arousal"].apply(lambda x: x[1]),
         kind="hex",
         color="skyblue",
     )
-    joint_plot.set_axis_labels("Arousal", "Valence", fontsize=11)
+    joint_plot.set_axis_labels("Valence", "Arousal", fontsize=11)
     min_arousal, max_arousal = st.slider(
         "Select Arousal Range:",
         min_value=1.0,

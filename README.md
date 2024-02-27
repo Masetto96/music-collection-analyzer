@@ -18,7 +18,6 @@ Utilizing Essentia, this aspect extracts features and embeddings from audio file
 - danceability-discogs-effnet-1.pb
 - discogs-effnet-bs64-1.pb
 - emomusic-msd-musicnn-2.pb
-- weights/deeptemp-k4-3.pb
 - genre_discogs400-discogs-effnet-1.pb
 - msd-musicnn-1.pb
 - voice_instrumental-discogs-effnet-1.pb

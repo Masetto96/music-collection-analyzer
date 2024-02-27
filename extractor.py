@@ -12,19 +12,17 @@ class FeatureExtractor(object):
         """
         self.discogs_effnet_metadata = u.load_json(discogs_effnet_metadata)
         self.tempo_extractor = es.RhythmExtractor2013()
-        # self.bpm_extractor = es.TempoCNN(graphFilename="weights/deeptemp-k4-3.pb")
-        # TODO: check sr of the algos
         self.loudness_extractor = es.LoudnessEBUR128()
 
         # https://essentia.upf.edu/reference/std_KeyExtractor.html
         self.key_extractor_temperley = es.KeyExtractor(profileType="temperley")
         self.key_extractor_krumhansl = es.KeyExtractor(profileType="krumhansl")
         self.key_extractor_edma = es.KeyExtractor(profileType="edma")
-    
+
         self.discogs_effnet_embed = es.TensorflowPredictEffnetDiscogs(
             graphFilename="weights/discogs-effnet-bs64-1.pb",
             output="PartitionedCall:1",
-        )   
+        )
         self.msd_music_cnn_embeddings = es.TensorflowPredictMusiCNN(
             graphFilename="weights/msd-musicnn-1.pb", output="model/dense/BiasAdd"
         )
@@ -50,7 +48,7 @@ class FeatureExtractor(object):
         return int(bpm)
         # global_tempo, _, _ = self.bpm_extractor(audio)
         # return global_tempo
-    
+
     def extract_key_temperly(self, audio: np.array):
         return self.key_extractor_temperley(audio)
 
@@ -91,7 +89,7 @@ class FeatureExtractor(object):
         """
         Returns softmax.
 
-        
+
         Avaraging over all the frames.
         """
         return tuple(np.mean(self.voice_instrumental_clf(discogs_embeddings), axis=0))[0]
@@ -105,10 +103,9 @@ class FeatureExtractor(object):
 
     def predict_valence_arousal(self, music_cnn_embeddings):
         """
-        Returns softmax.
         Avaraging over all the frames.
         """
-        return tuple(np.mean(self.arousal_valence_clf(music_cnn_embeddings), axis=0).tolist())
+        return tuple(np.mean(self.arousal_valence_clf(music_cnn_embeddings), axis=0))
 
     def _parse_discogs_genre_activations(self, activations: np.array):
         """
