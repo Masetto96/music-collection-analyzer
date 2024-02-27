@@ -16,26 +16,27 @@ def load_json(file_path):
     except json.JSONDecodeError:
         print("Invalid JSON format.")
 
-def save_result(path, name, file, pickle_only=True):
-    if not pickle_only:
-        with jsonlines.open(os.path.join(path, name + ".json"), mode="w") as writer:
-            writer.write_all(file)
+# def save_result(path, name, file, pickle_only=True):
+#     # this is not right and maybe useless
+#     if not pickle_only:
+#         with jsonlines.open(os.path.join(path, name + ".json"), mode="w") as writer:
+#             writer.write_all(file)
 
-    with open(os.path.join(path, name + ".pkl"), "wb") as f:
-        pickle.dump(file, f)
+#     with open(os.path.join(path, name + ".pkl"), "wb") as f:
+#         pickle.dump(file, f)
 
-def read_pickle_descriptors(pickle_file_path: str) -> pd.DataFrame:
-    with open(pickle_file_path, 'rb') as f:
-        data = pickle.load(f)
-    df = pd.DataFrame(data, columns=['file_path', 'features'])
-    # Unpack the dictionary of features
-    df_features = pd.json_normalize(df['features'])
-    # Combine the unpacked features DataFrame with the original DataFrame
-    df = pd.concat([df[['file_path']], df_features], axis=1)
-    return df
+# def read_pickle_descriptors(pickle_file_path: str) -> pd.DataFrame:
+#     with open(pickle_file_path, 'rb') as f:
+#         data = pickle.load(f)
+#     df = pd.DataFrame(data, columns=['file_path', 'features'])
+#     # Unpack the dictionary of features
+#     df_features = pd.json_normalize(df['features'])
+#     # Combine the unpacked features DataFrame with the original DataFrame
+#     df = pd.concat([df[['file_path']], df_features], axis=1)
+#     return df
 
-def load_essentia_analysis(ESSENTIA_ANALYSIS_PATH):
-    return pd.read_pickle(ESSENTIA_ANALYSIS_PATH)
+# def load_essentia_analysis(ESSENTIA_ANALYSIS_PATH):
+#     return pd.read_pickle(ESSENTIA_ANALYSIS_PATH)
 
 def read_numpy_arrays_from_pickle(filename, with_averaging=False):
     arrays = []
@@ -56,7 +57,18 @@ def read_numpy_arrays_from_pickle(filename, with_averaging=False):
     return arrays
 
 def get_most_similar_embeddings(similarity_matrix:np.array, idx:int, k:int=10):
-    # get the vector of interest, associated with the idx
+    """
+    A function to get the most similar embeddings based on a similarity matrix.
+
+    Parameters:
+    similarity_matrix (np.array): The similarity matrix of embeddings.
+    idx (int): The index of the vector of interest.
+    k (int, optional): The number of most similar embeddings to return. Defaults to 10.
+
+    Returns:
+    np.array: An array of indexes representing the most similar embeddings.
+    """
+    # get the vector of interest, associated with the idx   
     # sort based on similarity
     # flip the order of the list to get most similar first, descending order
     most_similar_indexes = np.argsort(similarity_matrix[idx])[::-1]

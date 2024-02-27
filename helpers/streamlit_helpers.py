@@ -47,7 +47,7 @@ def rank_by_style(audio_analysis, style_rank, mp3s):
     return ranked
 
 # Shuffling module
-def shuffle_tracks(track_list):
+def shuffle_tracks(track_list:list):
     random.shuffle(track_list)
     return track_list
 
