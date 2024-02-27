@@ -11,20 +11,20 @@ class FeatureExtractor(object):
         https://essentia.upf.edu/models.html
         """
         self.discogs_effnet_metadata = u.load_json(discogs_effnet_metadata)
-        # self.tempo_extractor = es.RhythmExtractor2013()
-        self.bpm_extractor = es.TempoCNN(graphFilename="weights/deeptemp-k4-3.pb")
+        self.tempo_extractor = es.RhythmExtractor2013()
+        # self.bpm_extractor = es.TempoCNN(graphFilename="weights/deeptemp-k4-3.pb")
+        # TODO: check sr of the algos
         self.loudness_extractor = es.LoudnessEBUR128()
 
         # https://essentia.upf.edu/reference/std_KeyExtractor.html
         self.key_extractor_temperley = es.KeyExtractor(profileType="temperley")
         self.key_extractor_krumhansl = es.KeyExtractor(profileType="krumhansl")
         self.key_extractor_edma = es.KeyExtractor(profileType="edma")
-
+    
         self.discogs_effnet_embed = es.TensorflowPredictEffnetDiscogs(
             graphFilename="weights/discogs-effnet-bs64-1.pb",
             output="PartitionedCall:1",
-        )
-
+        )   
         self.msd_music_cnn_embeddings = es.TensorflowPredictMusiCNN(
             graphFilename="weights/msd-musicnn-1.pb", output="model/dense/BiasAdd"
         )
@@ -46,10 +46,10 @@ class FeatureExtractor(object):
         )
 
     def extract_tempo(self, audio: np.array):
-        # bpm = self.tempo_extractor(audio)[0]
-        # return int(bpm)
-        global_tempo, _, _ = self.bpm_extractor(audio)
-        return global_tempo
+        bpm, *_ = self.tempo_extractor(audio)
+        return int(bpm)
+        # global_tempo, _, _ = self.bpm_extractor(audio)
+        # return global_tempo
     
     def extract_key_temperly(self, audio: np.array):
         return self.key_extractor_temperley(audio)
@@ -66,7 +66,6 @@ class FeatureExtractor(object):
         """
         try:
             # for this loudness extractor, sampling rate is by default 44100
-            assert int(sr) == 44100
             _, _, integrated_loudness, _ = self.loudness_extractor(audio)
             return integrated_loudness
         except Exception as e:
@@ -91,6 +90,8 @@ class FeatureExtractor(object):
     def predict_voice_instrumental(self, discogs_embeddings):
         """
         Returns softmax.
+
+        
         Avaraging over all the frames.
         """
         return tuple(np.mean(self.voice_instrumental_clf(discogs_embeddings), axis=0))[0]
@@ -102,7 +103,7 @@ class FeatureExtractor(object):
         """
         return tuple(np.mean(self.danceability_clf(discogs_embeddings), axis=0))[0]
 
-    def predict_arousal_valence(self, music_cnn_embeddings):
+    def predict_valence_arousal(self, music_cnn_embeddings):
         """
         Returns softmax.
         Avaraging over all the frames.

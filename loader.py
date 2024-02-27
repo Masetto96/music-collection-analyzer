@@ -4,7 +4,8 @@ import essentia.standard as es
 from pathlib import Path
 
 
-class AudioLoader(object):
+
+class AudioFilesLoader(object):
     """
     Only supports extensions listed below.
 
@@ -15,7 +16,7 @@ class AudioLoader(object):
     def __init__(self, data_path: str):
         logging.debug("Initializing AudioLoader")
         self.data_path = Path(data_path)
-        self.allowed_extensions = {".mp3", ".wav", ".flac", ".aac"}
+        self.allowed_extensions = [".mp3", ".wav", ".flac", ".aac"]
         self.mono_mixer = es.MonoMixer()
         logging.debug("Looking for files in: %s", self.data_path)
         self.total_num_files_found = len(
@@ -42,17 +43,18 @@ class AudioLoader(object):
         """
         try:
             logging.debug("Loading file: %s", filename)
+            # this returns stereo audio
             audio, sr, nc, _, _, _ = es.AudioLoader(filename=filename.as_posix())()
 
-            # mono_audio = es.MonoMixer()(audio, nc)
+            assert int(sr) == 44100
+
             mono_audio = self.mono_mixer(audio, nc)
 
-            # REVIEW: check quality parameter
             resampled_mono_audio = es.Resample(
                 inputSampleRate=float(sr), outputSampleRate=float(16000), quality=1
             ).compute(mono_audio)
 
-            return audio, sr, resampled_mono_audio
+            return audio, sr, mono_audio, resampled_mono_audio
 
         except Exception as e:
             logging.error(e)
@@ -62,8 +64,9 @@ class AudioLoader(object):
         Generator function to yield loaded audio for all valid files in the specified directory.
 
         Yields:
-        - Tuple: (audio, sr, audio_mono) for each valid audio file.
+        - Tuple: (audio, sr, audio_mono, file) for each valid audio file.
         """
         for file in self.data_path.rglob("*"):
+            # check if it's a valid file
             if file.suffix.lower() in self.allowed_extensions and file.is_file():
                 yield *self._load_audio(file), file
