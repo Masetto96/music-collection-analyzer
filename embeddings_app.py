@@ -21,9 +21,9 @@ musiccnn = np.array(musiccnn)
 st.title("Compare songs by cosine similarity!")
 st.subheader(" 🎛️ This app uses musiccnn and discogs-effnet embeddings to compute music similarity across tracks 🎚️ ")
 
-# st.warning("Thouhts on the following track? :smile: ")
-# st.audio("audio/audio.000/1P/1P12MkjjBnaC26XnyVNZ3G.mp3", format="audio/mp3", start_time=0)
-# bad_song = idxs_path.index("audio/audio.000/1P/1P12MkjjBnaC26XnyVNZ3G.mp3")
+st.warning("Thouhts on the following track? :smile: ")
+st.audio("audio/audio.000/1P/1P12MkjjBnaC26XnyVNZ3G.mp3", format="audio/mp3", start_time=0)
+bad_song = idxs_path.index("audio/audio.000/1P/1P12MkjjBnaC26XnyVNZ3G.mp3")
 
 similarity_matrix_discogs = cosine_similarity(discogs)
 similarity_matrix_musiccnn = cosine_similarity(musiccnn)

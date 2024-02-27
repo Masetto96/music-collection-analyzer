@@ -103,6 +103,7 @@ if st.button("RUN"):
     mp3s_idxs = list(essentia_descriptors.index)
     st.write("## 🔊 Results")
 
+    # TODO: refactor this code
     if playlist_option == "Genre":
         result = st_helpers.filter_by_style(
             genre_activations, style_select, style_select_range
@@ -116,7 +117,7 @@ if st.button("RUN"):
             essentia_descriptors, max_bpm=max_tempo, min_bpm=min_tempo
         )
         st.success(f"Found {len(mp3s_idxs)} songs")
-        st.dataframe(essentia_descriptors.iloc[mp3s_idxs]["tempo"])
+        # st.dataframe(essentia_descriptors.iloc[mp3s_idxs]["tempo"])s
 
     elif playlist_option == "Danceability":
         mp3s_idxs = st_helpers.filter_by_danceability(
@@ -140,12 +141,12 @@ if st.button("RUN"):
     elif playlist_option == "Key-Scale":
         mp3s_idxs = st_helpers.filter_by_key_scale(essentia_descriptors, key, mode)
         st.success(f"Found {len(mp3s_idxs)} songs")
-        st.dataframe(essentia_descriptors.iloc[mp3s_idxs]["keyscale_edma"].apply(lambda x:(x[0],x[1])))
+        # st.dataframe(essentia_descriptors.iloc[mp3s_idxs]["keyscale_edma"].apply(lambda x:(x[0],x[1])))
 
     elif playlist_option == "Vocal-Instrumental":
         mp3s_idxs = st_helpers.filter_vocal_instrumental(essentia_descriptors, is_instrumental)
         st.success(f"Found {len(mp3s_idxs)} songs")
-        st.dataframe(essentia_descriptors.iloc[mp3s_idxs]["voice_instrumental"])
+        # st.dataframe(essentia_descriptors.iloc[mp3s_idxs]["voice_instrumental"])
 
     # POST PROCESSING
     if style_rank:
@@ -159,7 +160,7 @@ if st.button("RUN"):
         st.write("Using top", len(mp3s_idxs), "tracks from the results.")
 
     if shuffle:
-        mp3s_idxs = st_helpers.shuffle_tracks(mp3s_idxs)
+        mp3s_idxs = st_helpers.shuffle_tracks(list(mp3s_idxs))
         st.write("Applied random shuffle.")
 
     if save_file and file_name:
