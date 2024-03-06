@@ -5,11 +5,8 @@ import os
 import helpers.utils as u
 
 
-
 def filter_by_bpm(audio_analysis, max_bpm: int, min_bpm: int):
-    return audio_analysis[
-        (audio_analysis["tempo"] >= min_bpm) & (audio_analysis["tempo"] <= max_bpm)
-    ].index
+    return audio_analysis[(audio_analysis["tempo"] >= min_bpm) & (audio_analysis["tempo"] <= max_bpm)].index
 
 
 def filter_by_arousal_and_valence(
@@ -19,9 +16,9 @@ def filter_by_arousal_and_valence(
     max_arousal: float,
     min_arousal: float,
 ):
-    idxs = (
-        audio_analysis["valence_arousal"].apply(lambda x: x[1]).between(min_arousal, max_arousal)
-    ) & (audio_analysis["valence_arousal"].apply(lambda x: x[0]).between(min_valence, max_valence))
+    idxs = (audio_analysis["valence_arousal"].apply(lambda x: x[1]).between(min_arousal, max_arousal)) & (
+        audio_analysis["valence_arousal"].apply(lambda x: x[0]).between(min_valence, max_valence)
+    )
     return audio_analysis[idxs].index
 
 
@@ -74,12 +71,6 @@ def save_playlist(file_name: str, track_list: list, playlist_path):
     with open(os.path.join(playlist_path, file_name + ".m3u8"), "w") as f:
         mp3_paths = [os.path.join("..", mp3) for mp3 in track_list]
         f.write("\n".join(mp3_paths))
-
-
-# Display results module
-def display_results(result, max_tracks):
-    st.write("Your results from the search")
-    st.write(result.head(max_tracks))
 
 
 def display_audio_previews(track_list: list):
