@@ -2,12 +2,10 @@ This project is an assignment for the course:
 # Music and Audio Processing Lab @ UPF, Music Technology Group
 ## Feature Extraction and Embeddings: 
 
-Utilizing Essentia, this aspect extracts features and embeddings from audio files, enabling a comprehensive understanding of their acoustic properties. This supports tasks such as music classification, mood detection, and content-based recommendation systems.
+Utilizing Essentia, extracts features and embeddings from audio files that are used to "navigate" through the collection of files with the following apps.
 
-## Streamlit Apps Development:
-
-- **Playlist Builder**: Web app for generating playlists based on user-defined audio descriptor queries, allowing users to curate playlists tailored to specific sonic characteristics.
-- **Music Similarity Comparison**: Web app enabling users to explore audio-content relationships by comparing songs based on cosine similarity between embeddings.
+- **Playlist Builder**: Web app for generating playlists based on user-defined audio descriptor queries, allowing users to create playlists with to specific characteristics.
+- **Music Similarity Comparison**: Web app to explore audio similarity by computing cosine similarity of embeddings of songs.
 
 ## Setup:
 ###  Data and Weights
@@ -43,6 +41,3 @@ streamlit run playlist_app.py
 ```bash
 streamlit run embeddings_app.py
 ```
-
-# Acknowledgments:
-This project relies on the Essentia library developed by the Music Technology Group at Universitat Pompeu Fabra in Barcelona, Spain. We extend our gratitude to the Essentia team for their significant contributions to the field of audio analysis.
